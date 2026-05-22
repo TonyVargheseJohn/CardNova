@@ -1,0 +1,190 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Products | CardNova Admin</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        .admin-wrapper { display: flex; min-height: 100vh; }
+        .admin-sidebar { width: 240px; background: var(--bg-secondary); border-right: 1px solid var(--border); padding: 1.5rem; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+        .admin-sidebar .logo { font-size: 1.4rem; font-weight: 800; color: var(--accent); margin-bottom: 2rem; display: block; }
+        .admin-sidebar nav a { display: block; padding: 0.8rem 1rem; color: var(--text-secondary); text-decoration: none; border-radius: 6px; margin-bottom: 0.5rem; transition: all 0.2s; }
+        .admin-sidebar nav a:hover, .admin-sidebar nav a.active { background: var(--bg-card); color: var(--accent); }
+        .admin-main { flex: 1; padding: 2rem; }
+        .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+        .btn-add { background: var(--accent); color: #fff; padding: 0.6rem 1.2rem; border-radius: 6px; text-decoration: none; font-weight: 600; }
+        .btn-add:hover { background: var(--accent-hover); }
+        .admin-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border); }
+        th { color: var(--text-secondary); font-weight: 600; }
+        .product-thumb { 
+            width: 60px; 
+            height: 60px; 
+            object-fit: cover; 
+            border-radius: 6px; 
+            background: var(--bg-primary);
+        }
+        .product-thumb-placeholder {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-primary);
+            border-radius: 6px;
+            font-size: 1.5rem;
+        }
+        .status-badge { padding: 0.3rem 0.7rem; border-radius: 4px; font-size: 0.85rem; font-weight: 600; }
+        .status-active { background: rgba(0,208,132,0.15); color: var(--success); }
+        .status-inactive { background: rgba(255,71,87,0.15); color: var(--danger); }
+        .btn-action { padding: 0.4rem 0.8rem; font-size: 0.85rem; margin-right: 0.5rem; cursor: pointer; border: none; border-radius: 4px; text-decoration: none; display: inline-block; }
+        .btn-warning { background: #ffa500; color: #000; }
+        .btn-danger { background: var(--danger); color: #fff; }
+        
+        /* Improved message styling */
+        .alert {
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            border-radius: 4px;
+        }
+        .alert-success { background: rgba(0,208,132,0.1); border-left: 3px solid var(--success); color: var(--success); }
+        .alert-error { background: rgba(255,71,87,0.1); border-left: 3px solid var(--danger); color: var(--danger); }
+        .alert-warning { background: rgba(255,165,0,0.1); border-left: 3px solid #ffa500; color: #ffa500; }
+        .alert-info { background: rgba(0,150,255,0.1); border-left: 3px solid #0096ff; color: #0096ff; }
+        
+        /* Image gallery indicator */
+        .image-count {
+            display: inline-block;
+            background: var(--accent);
+            color: white;
+            font-size: 0.7rem;
+            padding: 0.1rem 0.4rem;
+            border-radius: 10px;
+            margin-left: 0.5rem;
+        }
+        
+        @media (max-width: 768px) { 
+            .admin-wrapper { flex-direction: column; } 
+            .admin-sidebar { width: 100%; height: auto; position: relative; } 
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-wrapper">
+        <aside class="admin-sidebar">
+            <span class="logo">CardNova Admin</span>
+            <nav>
+                <a href="{% url 'wadmin:home' %}">📊 Dashboard</a>
+                <a href="{% url 'wadmin:manage_categories' %}">🏷️ Categories</a>
+                <a href="{% url 'wadmin:manage_products' %}" class="active">🃏 Products</a>
+                <a href="#">📦 Orders</a>
+                <hr style="border-color: var(--border); margin: 1rem 0;">
+                <a href="{% url 'wadmin:logout' %}" style="color: var(--danger);">Logout</a>
+                <a href="{% url 'guest:home' %}" style="margin-top: 1rem;">🌐 View Site</a>
+            </nav>
+        </aside>
+        <main class="admin-main">
+            <div class="admin-header">
+                <h2>Manage Products</h2>
+                <a href="{% url 'wadmin:add_product' %}" class="btn-add">+ Add New Product</a>
+            </div>
+            
+            {% if messages %}
+                {% for msg in messages %}
+                    <div class="alert alert-{{ msg.tags }}">
+                        {{ msg }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            <div class="admin-card">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Release Date</th>
+                            <th>Stock</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in products %}
+                        <tr>
+                            <td>
+                                {% if p.image %}
+                                    <img src="{{ p.image.url }}" alt="{{ p.name }}" class="product-thumb">
+                                {% else %}
+                                    <div class="product-thumb-placeholder">🖼️</div>
+                                {% endif %}
+                                {% if p.images.count > 0 %}
+                                    <span class="image-count" title="{{ p.images.count }} additional images">+{{ p.images.count }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <strong>{{ p.name }}</strong>
+                                {% if p.images.count > 0 %}
+                                    <br><small style="color: var(--text-secondary);">📸 {{ p.images.count }} gallery images</small>
+                                {% endif %}
+                            </td>
+                            <td>{{ p.category.name|default:"-" }}</td>
+                            <td>
+                                {% if p.sale_price %}
+                                    <span style="text-decoration:line-through;color:var(--text-secondary);font-size:0.9rem;">₹{{ p.price }}</span>
+                                    <span style="color:var(--accent);font-weight:700;"> ₹{{ p.sale_price }}</span>
+                                {% else %}
+                                    ₹{{ p.price }}
+                                {% endif %}
+                            </td>
+                            <td>{{ p.release_date|date:"Y-m-d"|default:"-" }}</td>
+                            <td>
+                                {% if p.stock <= 0 %}
+                                    <span style="color: var(--danger); font-weight: 600;">{{ p.stock }}</span>
+                                {% elif p.stock <= 10 %}
+                                    <span style="color: #ffa500; font-weight: 600;">{{ p.stock }}</span>
+                                {% else %}
+                                    {{ p.stock }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="status-badge status-{% if p.is_active %}active{% else %}inactive{% endif %}">
+                                    {% if p.is_active %}✅ Active{% else %}❌ Inactive{% endif %}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="{% url 'wadmin:edit_product' p.id %}" class="btn-action btn-warning">✏️ Edit</a>
+                                <form method="post" action="{% url 'wadmin:delete_product' p.id %}" style="display:inline;" onsubmit="return confirm('⚠️ Delete this product?\nThis will also delete all associated images!\nThis action cannot be undone.');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn-action btn-danger">🗑️ Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="8" style="text-align:center; color:var(--text-secondary); padding:3rem;">
+                                <div style="font-size: 3rem; margin-bottom: 1rem;">🃏</div>
+                                <div>No products yet.</div>
+                                <div style="margin-top: 1rem;">
+                                    <a href="{% url 'wadmin:add_product' %}" style="color:var(--accent); text-decoration: none; font-weight: 600;">➕ Add your first product</a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Optional: Show total products count -->
+            <div style="text-align: right; color: var(--text-secondary); font-size: 0.85rem; margin-top: 1rem;">
+                Total Products: {{ products|length }}
+            </div>
+        </main>
+    </div>
+</body>
+</html>

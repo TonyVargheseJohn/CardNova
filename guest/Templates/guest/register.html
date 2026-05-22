@@ -1,0 +1,86 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register | CardNova</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <style>
+    .auth-wrapper { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 2rem; background: var(--bg-secondary); }
+    .auth-box { background: var(--bg-card); border: 1px solid var(--border); padding: 2.5rem; border-radius: 12px; width: 100%; max-width: 420px; }
+    .auth-box h2 { text-align: center; font-size: 1.8rem; margin-bottom: 0.5rem; color: var(--accent); }
+    .subtitle { text-align: center; color: var(--text-secondary); margin-bottom: 2rem; }
+    .input-group { margin-bottom: 1.2rem; }
+    .input-group label { display: block; margin-bottom: 0.4rem; color: var(--text-secondary); font-size: 0.9rem; }
+    .input-group input { width: 100%; padding: 0.8rem; background: var(--bg-primary); border: 1px solid var(--border); border-radius: 6px; color: var(--text-primary); font-size: 1rem; }
+    .input-group input:focus { outline: none; border-color: var(--accent); }
+    .alert { padding: 0.8rem; border-radius: 6px; margin-bottom: 1rem; text-align: center; }
+    .alert-success { background: rgba(0,208,132,0.15); border: 1px solid var(--success); color: var(--success); }
+    .alert-error { background: rgba(255,71,87,0.15); border: 1px solid var(--danger); color: var(--danger); }
+    .auth-footer { text-align: center; margin-top: 1.5rem; color: var(--text-secondary); }
+    .auth-footer a { color: var(--accent); text-decoration: none; font-weight: 600; }
+    .btn-full { width: 100%; padding: 0.85rem; margin-top: 0.5rem; }
+  </style>
+</head>
+<body>
+
+<!-- Simple Navbar -->
+<nav class="navbar">
+  <div class="container">
+    <a href="{% url 'guest:home' %}" class="logo">Card<span>Nova</span></a>
+    <div class="nav-links">
+      <a href="{% url 'guest:home' %}">← Back to Home</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Register Form -->
+<div class="auth-wrapper">
+  <div class="auth-box">
+    <h2>Create Account</h2>
+    <p class="subtitle">Join CardNova to start collecting</p>
+
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+      
+      <!-- Email: REQUIRED -->
+      <div class="input-group">
+        <label>Email Address</label>
+        <input type="email" name="email" required placeholder="you@example.com">
+      </div>
+      
+      <!-- Phone: REQUIRED -->
+      <div class="input-group">
+        <label>Phone Number</label>
+        <input type="tel" name="phone_number" required placeholder="+91 98765 43210">
+      </div>
+      
+      <!-- Password: REQUIRED -->
+      <div class="input-group">
+        <label>Password</label>
+        <input type="password" name="password" required placeholder="Create a secure password">
+      </div>
+      
+      <button type="submit" class="btn btn-primary btn-full">Register</button>
+    </form>
+
+    <div class="auth-footer">
+      <p>Already have an account? <a href="{% url 'guest:login' %}">Login here</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer" style="margin-top: 0; border-top: 1px solid var(--border);">
+  <p>© 2026 CardNova. All rights reserved.</p>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,466 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | CardNova</title>
+    <style>
+        /* ============================================
+           ADMIN DASHBOARD STYLES - Direct Embed
+        ============================================ */
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+        }
+        
+        /* Admin Layout */
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            width: 280px;
+            background: #111111;
+            border-right: 1px solid #2a2a2a;
+            padding: 1.5rem;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        
+        .sidebar .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #ff6b00;
+            margin-bottom: 2rem;
+            display: block;
+            text-decoration: none;
+        }
+        
+        .sidebar .logo span {
+            color: white;
+        }
+        
+        .sidebar nav a {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: #aaa;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            transition: all 0.2s;
+        }
+        
+        .sidebar nav a:hover {
+            background: #1a1a1a;
+            color: #ff6b00;
+        }
+        
+        .sidebar nav a.active {
+            background: #1a1a1a;
+            color: #ff6b00;
+        }
+        
+        hr {
+            border-color: #2a2a2a;
+            margin: 1rem 0;
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            padding: 2rem;
+            width: 100%;
+        }
+        
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #2a2a2a;
+        }
+        
+        .header h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+        
+        .admin-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: #1a1a1a;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+        }
+        
+        .admin-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #ff6b00;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: #111111;
+            border: 1px solid #2a2a2a;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-4px);
+            border-color: #ff6b00;
+        }
+        
+        .stat-card p {
+            color: #aaa;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .stat-card h3 {
+            font-size: 2.5rem;
+            color: #ff6b00;
+            margin: 0.5rem 0;
+            font-weight: 700;
+        }
+        
+        /* Users Table */
+        .users-table {
+            background: #111111;
+            border: 1px solid #2a2a2a;
+            border-radius: 12px;
+            padding: 1.5rem;
+            overflow-x: auto;
+        }
+        
+        .users-table h3 {
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #2a2a2a;
+        }
+        
+        th {
+            color: #aaa;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        td {
+            color: #ddd;
+        }
+        
+        /* Status Badges */
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        
+        .status-active {
+            background: rgba(0, 200, 0, 0.15);
+            color: #00c800;
+            border: 1px solid rgba(0, 200, 0, 0.3);
+        }
+        
+        .status-pending {
+            background: rgba(255, 165, 0, 0.15);
+            color: #ffa500;
+            border: 1px solid rgba(255, 165, 0, 0.3);
+        }
+        
+        .status-inactive {
+            background: rgba(220, 53, 69, 0.15);
+            color: #dc3545;
+            border: 1px solid rgba(220, 53, 69, 0.3);
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin: 0 0.25rem;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        
+        .btn-warning {
+            background: #ffa500;
+            color: #000;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: #fff;
+        }
+        
+        .btn-primary {
+            background: #ff6b00;
+            color: #fff;
+        }
+        
+        .btn:hover {
+            opacity: 0.85;
+            transform: translateY(-1px);
+        }
+        
+        /* Select Dropdown */
+        select {
+            padding: 0.35rem 0.6rem;
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            color: #fff;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        
+        select:hover {
+            border-color: #ff6b00;
+        }
+        
+        /* Alert Messages */
+        .alert {
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        
+        .alert-success {
+            background: rgba(0, 200, 0, 0.1);
+            border: 1px solid #00c800;
+            color: #00c800;
+        }
+        
+        .alert-error {
+            background: rgba(220, 53, 69, 0.1);
+            border: 1px solid #dc3545;
+            color: #dc3545;
+        }
+        
+        .alert-info {
+            background: rgba(255, 107, 0, 0.1);
+            border: 1px solid #ff6b00;
+            color: #ff6b00;
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #aaa;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                position: relative;
+                height: auto;
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Weather Widget (Optional) */
+        .weather-widget {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+            z-index: 999;
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #ff6b00;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #e55a00;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <a href="{% url 'wadmin:home' %}" class="logo">Card<span>Nova</span></a>
+            <nav>
+                <a href="{% url 'wadmin:home' %}" class="active">📊 Dashboard</a>
+                <a href="{% url 'wadmin:manage_categories' %}">🏷️ Categories</a>
+                <a href="{% url 'wadmin:manage_products' %}">🃏 Products</a>
+                <a href="#">📦 Orders</a>
+                <a href="{% url 'wadmin:my_profile' %}">👤 My Profile</a>
+                <hr>
+                <a href="{% url 'guest:logout' %}">🚪 Logout</a>
+                <a href="{% url 'guest:home' %}">🌐 View Site</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="header">
+                <h2>Admin Dashboard</h2>
+                <div class="admin-info">
+                    <div class="admin-avatar">👤</div>
+                    <span>{{ current_admin.name|default:current_admin.email }}</span>
+                </div>
+            </div>
+
+            <!-- Alert Messages -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <!-- Statistics Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <p>Total Users</p>
+                    <h3>{{ stats.total_users|default:0 }}</h3>
+                </div>
+                <div class="stat-card">
+                    <p>Active Users</p>
+                    <h3>{{ stats.active_users|default:0 }}</h3>
+                </div>
+                <div class="stat-card">
+                    <p>Total Products</p>
+                    <h3>{{ stats.total_products|default:0 }}</h3>
+                </div>
+                <div class="stat-card">
+                    <p>Categories</p>
+                    <h3>{{ stats.total_categories|default:0 }}</h3>
+                </div>
+            </div>
+
+            <!-- Users Table -->
+            <div class="users-table">
+                <h3>📋 Registered Users</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>#{{ user.id }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ user.phone_number|default:"-" }}</td>
+                            <td>
+                                <span class="status-badge status-{{ user.status }}">
+                                    {{ user.status|title }}
+                                </span>
+                            </td>
+                            <td>
+                                <form method="post" style="display: inline-block;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="user_id" value="{{ user.id }}">
+                                    <input type="hidden" name="action" value="update_status">
+                                    <select name="status">
+                                        <option value="active" {% if user.status == 'active' %}selected{% endif %}>Active</option>
+                                        <option value="pending" {% if user.status == 'pending' %}selected{% endif %}>Pending</option>
+                                        <option value="inactive" {% if user.status == 'inactive' %}selected{% endif %}>Inactive</option>
+                                    </select>
+                                    <button type="submit" class="btn btn-warning">Update</button>
+                                </form>
+                                <form method="post" style="display: inline-block;" onsubmit="return confirm('Delete this user permanently?')">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="user_id" value="{{ user.id }}">
+                                    <input type="hidden" name="action" value="delete">
+                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="empty-state">No users registered yet</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Weather Widget -->
+    <div class="weather-widget">
+        🌤️ 32°C | Rain showers
+    </div>
+</body>
+</html>

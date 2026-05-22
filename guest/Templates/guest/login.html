@@ -1,0 +1,159 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login | CardNova</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <style>
+    .auth-wrapper { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 2rem; background: var(--bg-secondary); }
+    .auth-box { background: var(--bg-card); border: 1px solid var(--border); padding: 2.5rem; border-radius: 12px; width: 100%; max-width: 420px; }
+    .auth-box h2 { text-align: center; font-size: 1.8rem; margin-bottom: 0.5rem; color: var(--accent); }
+    .subtitle { text-align: center; color: var(--text-secondary); margin-bottom: 2rem; }
+    .input-group { margin-bottom: 1.2rem; }
+    .input-group label { display: block; margin-bottom: 0.4rem; color: var(--text-secondary); font-size: 0.9rem; }
+    
+    /* Password wrapper with toggle button */
+    .password-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .password-wrapper input {
+      width: 100%;
+      padding: 0.8rem;
+      padding-right: 3rem;
+      background: var(--bg-primary);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text-primary);
+      font-size: 1rem;
+    }
+    .password-wrapper input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    .toggle-password {
+      position: absolute;
+      right: 12px;
+      cursor: pointer;
+      background: transparent;
+      border: none;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      transition: color 0.2s;
+    }
+    .toggle-password:hover {
+      color: var(--accent);
+    }
+    .toggle-password svg {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+    }
+    .toggle-password .eye-slash {
+      display: none;
+    }
+    .toggle-password.visible .eye {
+      display: none;
+    }
+    .toggle-password.visible .eye-slash {
+      display: block;
+    }
+    
+    .alert { padding: 0.8rem; border-radius: 6px; margin-bottom: 1rem; text-align: center; }
+    .alert-success { background: rgba(0,208,132,0.15); border: 1px solid var(--success); color: var(--success); }
+    .alert-error { background: rgba(255,71,87,0.15); border: 1px solid var(--danger); color: var(--danger); }
+    .auth-footer { text-align: center; margin-top: 1.5rem; color: var(--text-secondary); }
+    .auth-footer a { color: var(--accent); text-decoration: none; font-weight: 600; }
+    .btn-full { width: 100%; padding: 0.85rem; margin-top: 0.5rem; }
+  </style>
+</head>
+<body>
+
+<!-- Simple Navbar -->
+<nav class="navbar">
+  <div class="container">
+    <a href="{% url 'guest:home' %}" class="logo">Card<span>Nova</span></a>
+    <div class="nav-links">
+      <a href="{% url 'guest:home' %}">← Back to Home</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Login Form -->
+<div class="auth-wrapper">
+  <div class="auth-box">
+    <h2>Welcome Back</h2>
+    <p class="subtitle">Login to your CardNova account</p>
+
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="input-group">
+        <label>Email Address</label>
+        <input type="email" name="email" required placeholder="you@example.com">
+      </div>
+      <div class="input-group">
+        <label>Password</label>
+        <div class="password-wrapper">
+          <input type="password" name="password" id="password" required placeholder="Enter your password">
+          <button type="button" class="toggle-password" id="togglePassword" onclick="togglePasswordVisibility()">
+            <!-- Eye Open Icon -->
+            <svg class="eye" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+            <!-- Eye Closed Icon -->
+            <svg class="eye-slash" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+              <line x1="1" y1="1" x2="23" y2="23"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary btn-full">Login</button>
+    </form>
+
+    <div class="auth-footer">
+      <p>New here? <a href="{% url 'guest:register' %}">Create Account</a></p>
+      <p style="margin-top: 0.5rem; font-size: 0.85rem;">
+        <a href="{% url 'wadmin:home' %}" style="color: var(--text-secondary);">Admin Login →</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer" style="margin-top: 0; border-top: 1px solid var(--border);">
+  <p>© 2026 CardNova. All rights reserved.</p>
+</footer>
+
+<script>
+  function togglePasswordVisibility() {
+    const passwordInput = document.getElementById('password');
+    const toggleBtn = document.getElementById('togglePassword');
+    
+    if (passwordInput.type === 'password') {
+      passwordInput.type = 'text';
+      toggleBtn.classList.add('visible');
+    } else {
+      passwordInput.type = 'password';
+      toggleBtn.classList.remove('visible');
+    }
+  }
+</script>
+
+</body>
+</html>

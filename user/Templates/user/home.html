@@ -1,0 +1,117 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | CardNova</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        .user-layout { display: flex; min-height: 100vh; }
+        .user-sidebar { width: 240px; background: var(--bg-secondary); border-right: 1px solid var(--border); padding: 1.5rem; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+        .user-sidebar .logo { font-size: 1.4rem; font-weight: 800; color: var(--accent); margin-bottom: 2rem; display: block; text-decoration: none; }
+        .user-sidebar nav a { display: block; padding: 0.8rem 1rem; color: var(--text-secondary); text-decoration: none; border-radius: 6px; margin-bottom: 0.5rem; transition: all 0.2s; }
+        .user-sidebar nav a:hover, .user-sidebar nav a.active { background: var(--bg-card); color: var(--accent); }
+        .user-main { flex: 1; padding: 2rem; overflow-y: auto; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; text-align: center; }
+        .stat-card h3 { font-size: 2rem; color: var(--accent); margin: 0.5rem 0; }
+        .stat-card p { color: var(--text-secondary); margin: 0; }
+        
+        .welcome-banner { background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%); padding: 2rem; border-radius: 12px; margin-bottom: 2rem; color: white; }
+        .welcome-banner h1 { margin: 0 0 0.5rem; font-size: 1.8rem; }
+        .welcome-banner p { margin: 0; opacity: 0.9; }
+        
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin: 2rem 0 1rem; }
+        .section-header h3 { margin: 0; font-size: 1.3rem; color: var(--text-primary); }
+        .view-all { color: var(--accent); text-decoration: none; font-size: 0.9rem; }
+        .view-all:hover { text-decoration: underline; }
+        
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.5rem; margin-top: 1rem; }
+        .product-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; transition: transform 0.2s; }
+        .product-card:hover { transform: translateY(-4px); border-color: var(--accent); }
+        .product-img { width: 100%; height: 180px; object-fit: cover; background: var(--bg-primary); }
+        .product-info { padding: 1rem; }
+        .product-info h3 { font-size: 1rem; margin: 0 0 0.5rem; color: var(--text-primary); }
+        .price { color: var(--accent); font-weight: 700; font-size: 1.1rem; }
+        .old-price { text-decoration: line-through; color: var(--text-secondary); font-size: 0.85rem; margin-left: 0.5rem; }
+        .btn-add-cart { padding: 0.5rem 1rem; background: var(--accent); color: #fff; border: none; border-radius: 4px; cursor: pointer; width: 100%; margin-top: 0.5rem; transition: background 0.2s; text-decoration: none; display: inline-block; text-align: center; }
+        .btn-add-cart:hover { background: var(--accent-hover); }
+        
+        .alert { padding: 0.75rem; border-radius: 6px; margin-bottom: 1rem; }
+        .alert-success { background: rgba(0,208,132,0.1); border: 1px solid var(--success); color: var(--success); }
+        .alert-error { background: rgba(255,71,87,0.1); border: 1px solid var(--danger); color: var(--danger); }
+        .cart-badge { background: var(--accent); color: #fff; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.75rem; margin-left: 0.5rem; }
+        
+        @media (max-width: 768px) { .user-layout { flex-direction: column; } .user-sidebar { width: 100%; height: auto; position: relative; } }
+    </style>
+</head>
+<body>
+    <div class="user-layout">
+        <aside class="user-sidebar">
+            <a href="{% url 'user:home' %}" class="logo">Card<span>Nova</span></a>
+            <nav>
+                <a href="{% url 'user:home' %}" class="active">🏠 Dashboard</a>
+                <a href="{% url 'user:profile' %}">👤 My Profile</a>
+                <!-- ✅ FIXED: Changed 'user:cart' to 'user:cart_view' -->
+                <a href="{% url 'user:cart_view' %}">🛒 My Cart {% if cart_count %}<span class="cart-badge">{{ cart_count }}</span>{% endif %}</a>
+                <a href="#">📦 My Orders</a>
+                <a href="#">❤️ Wishlist</a>
+                <hr style="border-color: var(--border); margin: 1rem 0;">
+                <a href="{% url 'user:logout' %}" style="color: var(--danger);">🚪 Logout</a>
+            </nav>
+        </aside>
+        
+        <main class="user-main">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+            
+            <div class="welcome-banner">
+                <h1>Welcome, {{ current_user.email|default:"User" }}! 👋</h1>
+                <p>Discover amazing trading cards and collectibles</p>
+            </div>
+            
+            <!-- Stats (Will become dynamic when Orders app is built) -->
+            <div class="stats-grid">
+                <div class="stat-card"><p>Total Orders</p><h3>0</h3></div>
+                <div class="stat-card"><p>Pending Orders</p><h3>0</h3></div>
+                <div class="stat-card"><p>Completed Orders</p><h3>0</h3></div>
+                <div class="stat-card"><p>Wishlist Items</p><h3>0</h3></div>
+            </div>
+            
+            <div class="section-header">
+                <h3>🔥 Latest Arrivals</h3>
+                <a href="{% url 'user:home' %}" class="view-all">Refresh →</a>
+            </div>
+            
+            <div class="product-grid">
+                {% for product in products %}
+                <div class="product-card">
+                    {% if product.image %}
+                        <img src="{{ product.image.url }}" class="product-img" alt="{{ product.name }}">
+                    {% else %}
+                        <div class="product-img" style="display: flex; align-items: center; justify-content: center; font-size: 3rem;">🃏</div>
+                    {% endif %}
+                    <div class="product-info">
+                        <h3>{{ product.name }}</h3>
+                        <div class="price">
+                            ₹{{ product.sale_price|default:product.price }}
+                            {% if product.sale_price %}
+                                <span class="old-price">₹{{ product.price }}</span>
+                            {% endif %}
+                        </div>
+                        <a href="{% url 'user:add_to_cart' product.id %}" class="btn-add-cart">Add to Cart 🛒</a>
+                    </div>
+                </div>
+                {% empty %}
+                <p style="grid-column: 1/-1; text-align: center; color: var(--text-secondary);">No products available yet. Check back soon!</p>
+                {% endfor %}
+            </div>
+        </main>
+    </div>
+</body>
+</html>
