@@ -1,0 +1,64 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Environment Variables
+.env
+.env.*
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv/
+
+# Static Files
+staticfiles/
+
+# Media Files (optional)
+media/
+
+# Migrations (optional - usually DO NOT ignore)
+# */migrations/*
+# !*/migrations/__init__.py
+
+# IDEs
+.vscode/
+.idea/
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Pytest
+.pytest_cache/
+
+# Coverage Reports
+.coverage
+htmlcov/
+
+# Build Files
+build/
+dist/
+*.egg-info/
+
+# MyPy
+.mypy_cache/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# Logs
+logs/
+*.log
+
+# Temporary Files
+*.tmp
+*.bak
